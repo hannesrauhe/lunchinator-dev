@@ -1,3 +1,8 @@
+#!/bin/bash
+. /etc/profile
+export DEBFULLNAME="The Lunch Team"
+export DEBEMAIL=info@lunchinator.de
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd $DIR
@@ -31,10 +36,10 @@ do
     popd
 
     #echo $VERSION
-    ./make_deb.sh --publish
+    ./make_deb.sh --publish &&
+    echo $THIS_HASH > last_hash_${branch}
     ./make_deb.sh --clean
 
-    echo $THIS_HASH > last_hash_${branch}
   fi
 
   sleep 2
