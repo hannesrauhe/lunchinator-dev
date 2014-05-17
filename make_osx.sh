@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
+then
+  export LUNCHINATOR_GIT="$(pwd)/lunchinator"
+fi
+
 args=$(getopt -l "publish,clean" -o "pc" -- "$@")
 
 if [ ! $? == 0 ]
@@ -35,16 +40,18 @@ while [ $# -ge 1 ]; do
   shift
 done
 
-
-# ensure pyinstaller is in PATH
-
+pushd "$LUNCHINATOR_GIT" &>/dev/null 
 VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
 echo "$VERSION" > lunchinator/version
+popd &>/dev/null
 
 rm -rf build/ dist/
 
 echo "*** Building Application Bundle ***"
-pyinstaller -y -F -w lunchinator_osx.spec
+if ! pyinstaller -y -F -w lunchinator_osx.spec
+then
+  exit 1
+fi
 
 cp lunchinator/version dist/Lunchinator.app/Contents
 git rev-list HEAD --count > dist/Lunchinator.app/Contents/commit_count
@@ -59,11 +66,17 @@ cp $(which terminal-notifier) dist/Lunchinator.app/Contents/bin
 
 echo "*** Creating tarball ***"
 cd dist
-tar cjf Lunchinator.app.tbz Lunchinator.app
+if ! tar cjf Lunchinator.app.tbz Lunchinator.app
+then
+  exit 1
+fi
 cd ..
 
 echo "*** Creating signature file ***"
-PYTHONPATH=lunchinator:$PYTHONPATH python hashNsign.py dist/Lunchinator.app.tbz
+if ! PYTHONPATH=$LUNCHINATOR_GIT:$PYTHONPATH python hashNsign.py dist/Lunchinator.app.tbz
+then
+  exit 1
+fi
 
 if $PUBLISH
 then
@@ -75,4 +88,8 @@ mput -rf dist/${VERSION}/
 mput -f dist/latest_version.asc
 quit
 EOF
+  if [ $? != 0 ]
+  then
+    exit 1
+  fi
 fi

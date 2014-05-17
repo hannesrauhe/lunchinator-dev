@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
+then
+  LUNCHINATOR_GIT="$(pwd)/lunchinator"
+fi
+
 if [ "$OBSUSERNAME" == "" ]
 then
   echo "Please export OBSUSERNAME to your environment."
@@ -93,18 +98,17 @@ fi
 clean
 update
 
-source determine_version.sh
-
 # version has to be located besides setup.py
-echo $VERSION > ../version
+pushd "$LUNCHINATOR_GIT" &>/dev/null 
+VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
+echo "$VERSION" > lunchinator/version
 
 export dist=
 # if this is run on Ubuntu, have setup.py know this is not for Ubuntu.
 export __notubuntu=1
-pushd ..
 python setup.py sdist --dist-dir=installer/osc/home:${OBSUSERNAME}/lunchinator
 python setup.py bdist_rpm --spec-only --dist-dir=installer/osc/home:${OBSUSERNAME}/lunchinator
-popd
+popd &>/dev/null
 sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
 #sed -i -e 's/\(python setup\.py install.*$\)/\1 --prefix=usr --exec-prefix=usr/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
 #sed -i -e '/%files.*/r add_files' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec

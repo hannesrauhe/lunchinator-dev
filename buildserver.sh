@@ -27,14 +27,21 @@ then
   finish 1
 fi
 
+# TODO what!? Also, I don't know what BASH_SOURCE does. What's wrong with $0?
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# TODO but we are already in $DIR...
 pushd $DIR
 
 if [ ! -d "lunchinator" ]
 then
   git clone https://github.com/hannesrauhe/lunchinator.git
 fi
+
+# for use in make_*.sh
+export CHANGELOG_PY="$(pwd)/changelog.py"
+export LUNCHINATOR_GIT="$(pwd)/lunchinator"
+export PYTHONPATH=$LUNCHINATOR_GIT:$PYTHONPATH
 
 branches=(master nightly)
 
@@ -46,24 +53,22 @@ do
     LAST_HASH=$(cat last_hash_${branch})
   fi
   
-  pushd lunchinator
+  pushd "$LUNCHINATOR_GIT"
   git checkout $branch
   git pull
 
   THIS_HASH="$(git rev-parse HEAD)"
+  popd
 
   if [ $LAST_HASH == $THIS_HASH ]
   then
-    popd 
     log "No new version in git for $branch"
   else
-    VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
-    echo $VERSION > version
-    git log $LAST_HASH..HEAD --oneline --no-merges > changelog
-    popd
+    export LAST_HASH
 
     #echo $VERSION
-    if eval "./$1 --publish" 2>&1 | tee -a buildserver.log
+    eval "./$1 --publish" 2>&1 | tee -a buildserver.log
+    if [ ${PIPESTATUS[0]} -eq 0 ]
     then
       log "Successfully built version $VERSION"
       echo $THIS_HASH > last_hash_${branch}

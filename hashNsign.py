@@ -11,7 +11,6 @@ except:
             break
         path = os.path.dirname(path)
     
-from lunchinator.git import GitHandler
 from lunchinator.lunch_settings import lunch_settings
 from lunchinator.utilities import getGPG
 
@@ -33,14 +32,13 @@ logging.info("Hash is %s" % fileHash)
 versionString = lunch_settings.get_singleton_instance().get_version()
 commitCount = versionString.split('.')[-1]
 
-changeLogPath = os.path.join(os.path.dirname(sys.argv[1]), "changelog")
-if os.path.exists(changeLogPath):
-    with codecs.open(changeLogPath, 'rb', 'utf-8') as inFile:
-        changeLog = [line for line in inFile]
+if os.getenv("CHANGELOG_PY") and os.getenv("LAST_HASH") and os.getenv("LUNCHINATOR_GIT"):
+    execfile(os.getenv("CHANGELOG_PY"))
+    changeLog = getLatestChangeLog(os.getenv("LAST_HASH"), False, os.getenv("LUNCHINATOR_GIT"))
     if changeLog:
         changeLog = json.dumps(changeLog)
 else:
-    logging.warning("No changelog file found.")
+    logging.warning("Could not generate change log.")
     changeLog = []
 
 

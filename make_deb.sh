@@ -1,12 +1,20 @@
 #!/bin/bash
 
+if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
+then
+  LUNCHINATOR_GIT="$(pwd)/lunchinator"
+fi
+
 function generate_changelog() {
-  cat ../../lunchinator/changelog |
-  while read line 
-  do
-    echo "$line"
-    dch -a "$line"
-  done
+	if [ $LAST_HASH != "" ]
+	then
+	  CHANGELOG="$(python "$CHANGELOG_PY" --only-first-line --print-lines --last-hash=$LAST_HASH --path="$LUNCHINATOR_GIT")"
+	  echo "$CHANGELOG" |
+	  while read line 
+	  do
+	    dch -a "$line"
+	  done
+  fi
   sed -i -e '/automatically created by stdeb/d' debian/changelog
 }
 
@@ -77,12 +85,17 @@ then
   exit 1
 fi
 
+pushd "$LUNCHINATOR_GIT" &>/dev/null 
+VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
+echo "$VERSION" > lunchinator/version
+popd &>/dev/null
+
 for dist in "${dists[@]}"
 do
   echo -e "\e[00;31m***** Creating source package for ${dist} *****\e[00m"
   export dist
   rm -rf dist deb_${dist}
-  pushd lunchinator
+  pushd "$LUNCHINATOR_GIT"
   export __lunchinator_branch=$(git rev-parse --abbrev-ref HEAD)
   export __isubuntu=1 #make sure setup.py builds for ubuntu
   python setup.py sdist --dist-dir=../dist
