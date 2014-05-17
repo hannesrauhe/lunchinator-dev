@@ -3,6 +3,7 @@
 if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
 then
   LUNCHINATOR_GIT="$(pwd)/lunchinator"
+  LUNCHINATOR_DEV=".."
 fi
 
 if [ "$OBSUSERNAME" == "" ]
@@ -101,13 +102,13 @@ update
 # version has to be located besides setup.py
 pushd "$LUNCHINATOR_GIT" &>/dev/null 
 VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
-echo "$VERSION" > lunchinator/version
+echo "$VERSION" > version
 
 export dist=
 # if this is run on Ubuntu, have setup.py know this is not for Ubuntu.
 export __notubuntu=1
-python setup.py sdist --dist-dir=installer/osc/home:${OBSUSERNAME}/lunchinator
-python setup.py bdist_rpm --spec-only --dist-dir=installer/osc/home:${OBSUSERNAME}/lunchinator
+python setup.py sdist --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
+python setup.py bdist_rpm --spec-only --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
 popd &>/dev/null
 sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
 #sed -i -e 's/\(python setup\.py install.*$\)/\1 --prefix=usr --exec-prefix=usr/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec

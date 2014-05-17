@@ -41,6 +41,7 @@ fi
 # for use in make_*.sh
 export CHANGELOG_PY="$(pwd)/changelog.py"
 export LUNCHINATOR_GIT="$(pwd)/lunchinator"
+export LUNCHINATOR_DEV="$DIR"
 export PYTHONPATH=$LUNCHINATOR_GIT:$PYTHONPATH
 
 branches=(master nightly)

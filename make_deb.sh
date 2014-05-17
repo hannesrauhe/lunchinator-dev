@@ -6,7 +6,7 @@ then
 fi
 
 function generate_changelog() {
-	if [ $LAST_HASH != "" ]
+	if [ "$LAST_HASH" != "" ]
 	then
 	  CHANGELOG="$(python "$CHANGELOG_PY" --only-first-line --print-lines --last-hash=$LAST_HASH --path="$LUNCHINATOR_GIT")"
 	  echo "$CHANGELOG" |
@@ -87,7 +87,7 @@ fi
 
 pushd "$LUNCHINATOR_GIT" &>/dev/null 
 VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
-echo "$VERSION" > lunchinator/version
+echo "$VERSION" > version
 popd &>/dev/null
 
 for dist in "${dists[@]}"
