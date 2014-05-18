@@ -27,10 +27,7 @@ then
   finish 1
 fi
 
-# TODO what!? Also, I don't know what BASH_SOURCE does. What's wrong with $0?
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# TODO but we are already in $DIR...
+DIR="$(dirname "${BASH_SOURCE[0]}")
 pushd $DIR
 
 if [ ! -d "lunchinator" ]
