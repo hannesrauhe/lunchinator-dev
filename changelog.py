@@ -93,7 +93,8 @@ def parse_args():
                       help="Git path.")
     return optionParser.parse_args()
 
-if __name__ == '__main__':
+# ensure this is not executed when sourced from hashNSign
+if __name__ == '__main__' and "changelog.py" in __file__:
     import json
     options, args = parse_args()
     

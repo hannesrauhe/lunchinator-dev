@@ -1,5 +1,9 @@
 import logging, sys, os, hashlib, shutil
-import json, codecs
+import json
+
+if os.getenv("LUNCHINATOR_GIT"):
+    path = os.getenv("LUNCHINATOR_GIT")
+    sys.path.insert(0, path)
 
 try:
     import lunchinator
