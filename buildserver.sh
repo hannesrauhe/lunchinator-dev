@@ -48,9 +48,9 @@ branches=(master nightly)
 for branch in "${branches[@]}"
 do
   LAST_HASH="HEAD^"
-  if [ -e last_hash_${branch} ]
+  if [ -e last_hash_${1}_${branch} ]
   then
-    LAST_HASH=$(cat last_hash_${branch})
+    LAST_HASH=$(cat last_hash_${1}_${branch})
   fi
   
   pushd "$LUNCHINATOR_GIT"
@@ -71,7 +71,7 @@ do
     if [ ${PIPESTATUS[0]} -eq 0 ]
     then
       log "Successfully built version $VERSION"
-      echo $THIS_HASH > last_hash_${branch}
+      echo $THIS_HASH > last_hash_${1}_${branch}
     fi
     log "Cleaning up"
     eval "./$1 --clean" 2>&1 | tee -a buildserver.log
