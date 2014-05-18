@@ -14,9 +14,8 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
     """Reads the commit messages since a given tag
     
     This method reads the commit messages since lastHash and returns
-    a list that contains a string for single line commits or a list
-    of strings for multi line commits. For multi line commits, the
-    empty line as well as bullet points are removed.
+    a list of commit messages. Lines with bullet points will be reformatted
+    to start with an asterisk, immediately followed by the message.
     
     Lines like "Merge x into y" and merge conflicts are automatically skipped.
     
@@ -42,12 +41,11 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                 if not message[0]:
                     continue
                 if message[0][0] in bulletpoints:
-                    result.append(message[0][1:])
+                    result.append(message[0][1:].strip())
                 else:
                     result.append(message[0])
             elif len(message) > 2 and len(message[1]) == 0:
                 # properly formatted multi line commit
-                cleanedmessage = []
                 skipSection = False
                 for line in message:
                     if len(line) == 0:
@@ -62,28 +60,16 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                         continue
                     
                     if line[0] in bulletpoints:
-                        cleanedmessage.append(line[1:])
-                    elif len(cleanedmessage) == 0:
-                        # start new list
-                        cleanedmessage.append(line)
+                        if not onlyFirstLine:
+                            result.append("*" + line[1:].strip())
                     else:
-                        # no bullet point -- treat as new description line
-                        if len(cleanedmessage) == 1 or onlyFirstLine:
-                            result.append(cleanedmessage[0])
-                        elif len(cleanedmessage) > 1:
-                            result.append(cleanedmessage)
-                        cleanedmessage = [line]
-                        
-                if len(cleanedmessage) == 1 or onlyFirstLine:
-                    result.append(cleanedmessage[0])
-                elif len(cleanedmessage) > 1:
-                    result.append(cleanedmessage)
+                        result.append(line)
             else:
                 logging.warning("Improperly formatted commit message for commit # " + aHash)
                 # tread each line as single commit
                 for line in message:
                     if line[0] in bulletpoints:
-                        result.append(line[1:])
+                        result.append(line[1:].strip())
                     else:
                         result.append(line)
             
