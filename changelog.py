@@ -1,29 +1,14 @@
-from lunchinator import log_warning, log_exception
 from optparse import OptionParser
-import subprocess, os
+import subprocess
+import logging
 
-# TODO use GitHandler as soon as peersandplugins is merged into master
-def runGitCommand(args, path=None, quiet=True):
-    """Runs a git command and returns a triple (return code, stdout output, stderr output)"""
-    if path == None:
-        from lunchinator import get_settings
-        path = get_settings().get_main_package_path()
-     
+def getGitCommandOutput(args, path):
     call = ["git", "--no-pager", "--git-dir=" + path + "/.git", "--work-tree=" + path]
     call = call + args
      
-    fh = subprocess.PIPE    
-    if quiet:
-        fh = open(os.path.devnull, "w")
-    p = subprocess.Popen(call, stdout=fh, stderr=fh)
-    pOut, pErr = p.communicate()
-    retCode = p.returncode
-    return retCode, pOut, pErr
-
-def getGitCommandOutput(args, path=None):
-    """Runs a git command and returns the stdout output."""
-    _retCode, pOut, _pErr = runGitCommand(args, path, quiet=False)
-    return pOut.strip()
+    p = subprocess.Popen(call, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    pOut, _pErr = p.communicate()
+    return pOut
     
 def getLatestChangeLog(lastHash, onlyFirstLine, path):
     """Reads the commit messages since a given tag
@@ -94,7 +79,7 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                 elif len(cleanedmessage) > 1:
                     result.append(cleanedmessage)
             else:
-                log_warning("Improperly formatted commit message for commit #", aHash)
+                logging.warning("Improperly formatted commit message for commit # " + aHash)
                 # tread each line as single commit
                 for line in message:
                     if line[0] in bulletpoints:
@@ -104,7 +89,7 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
             
         return result
     except:
-        log_exception("Error generating changelog")
+        logging.exception("Error generating changelog")
         return None
         
 def parse_args():
