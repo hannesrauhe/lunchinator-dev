@@ -60,7 +60,7 @@ while [ $# -ge 1 ]; do
         exit 0
         ;;
     -h)
-        echo "Use with -p|--publish to publish to Launchpad immediately."
+        echo "Use with -p|--publish to publish to OBS immediately."
         exit 0
         ;;
   esac
@@ -107,16 +107,25 @@ echo "$VERSION" > version
 export dist=
 # if this is run on Ubuntu, have setup.py know this is not for Ubuntu.
 export __notubuntu=1
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export __lunchinator_branch=$BRANCH
 python setup.py sdist --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
 python setup.py bdist_rpm --spec-only --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
 popd &>/dev/null
-sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
-#sed -i -e 's/\(python setup\.py install.*$\)/\1 --prefix=usr --exec-prefix=usr/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
-#sed -i -e '/%files.*/r add_files' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
+
+if [ $BRANCH=="master" ]
+then
+  SPECFILE=Lunchinator.spec
+else
+  SPECFILE=Lunchinator-${BRANCH}.spec
+fi
+
+sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/lunchinator/$SPECFILE
+
 if $PUBLISH
 then
   pushd osc/home:${OBSUSERNAME}/lunchinator
-  osc add Lunchinator.spec
+  osc add $SPECFILE
   for f in $(osc st | grep '^?' | sed -e 's/^?\s*//')
   do
     osc add "$f"

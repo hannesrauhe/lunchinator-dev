@@ -2,6 +2,7 @@
 . /etc/profile
 export DEBFULLNAME="The Lunch Team"
 export DEBEMAIL=info@lunchinator.de
+export OBSUSERNAME=Cornelius_Ratsch
 
 if [ $(uname) == "Darwin" ]
 then
@@ -19,6 +20,9 @@ function finish() {
   exit $1
 }
 
+pushd "$( dirname "${BASH_SOURCE[0]}" )"
+
+
 log "---------- Starting build at $(date) ----------"
 
 if [ "$1" == "" ]
@@ -27,8 +31,6 @@ then
   finish 1
 fi
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
-pushd $DIR
 
 if [ ! -d "lunchinator" ]
 then
