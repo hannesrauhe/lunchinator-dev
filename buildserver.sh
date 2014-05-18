@@ -27,7 +27,7 @@ then
   finish 1
 fi
 
-DIR="$(dirname "${BASH_SOURCE[0]}")
+DIR="$(dirname "${BASH_SOURCE[0]}")"
 pushd $DIR
 
 if [ ! -d "lunchinator" ]
