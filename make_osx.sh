@@ -42,7 +42,7 @@ done
 
 pushd "$LUNCHINATOR_GIT" &>/dev/null 
 VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
-echo "$VERSION" > lunchinator/version
+echo "$VERSION" > version
 popd &>/dev/null
 
 rm -rf build/ dist/
@@ -53,7 +53,7 @@ then
   exit 1
 fi
 
-cp lunchinator/version dist/Lunchinator.app/Contents
+cp "${LUNCHINATOR_GIT}/version" dist/Lunchinator.app/Contents
 git rev-list HEAD --count > dist/Lunchinator.app/Contents/commit_count
 cat > dist/Lunchinator.app/Contents/Resources/qt.conf <<EOF
 [paths]
@@ -61,7 +61,7 @@ Plugins=MacOS/qt4_plugins
 EOF
 
 echo "*** copying python code into bundle ***"
-cp -r lunchinator/bin lunchinator/images lunchinator/lunchinator lunchinator/plugins lunchinator/sounds lunchinator/start_lunchinator.py  dist/Lunchinator.app/Contents
+cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py dist/Lunchinator.app/Contents
 cp $(which terminal-notifier) dist/Lunchinator.app/Contents/bin
 
 echo "*** Creating tarball ***"
