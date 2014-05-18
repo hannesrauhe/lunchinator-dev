@@ -19,16 +19,54 @@ function finish() {
   exit $1
 }
 
-log "---------- Starting build at $(date) ----------"
-
-if [ "$1" == "" ]
-then
-  log "No command provided. Aborting." 1>&2
-  finish 1
-fi
-
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 pushd $DIR
+
+log "---------- Starting build at $(date) ----------"
+
+args=$(getopt -l "no-publish,no-nightlies,build:" -o "b:" -- "$@")
+
+if [ ! $? == 0 ]
+then
+  exit 1
+fi
+
+eval set -- "$args"
+
+NIGHTLIES=true
+PUBLISH=true
+
+while [ $# -ge 1 ]; do
+  case "$1" in
+    --)
+        # No more options left.
+        shift
+        break
+       ;;
+    -b|--build)
+        BUILD_SCRIPT="$2"
+        shift
+        ;;
+    --no-publish)
+        PUBLISH=false
+        ;;
+    --no-nightlies)
+        NIGHTLIES=false
+        ;;
+    -h)
+        echo "--no-publish to disable publishing, --no-nightlies to disable nightly builds."
+        exit 0
+        ;;
+  esac
+
+  shift
+done
+
+if [ "$BUILD_SCRIPT" == "" ]
+then
+  log "No build script provided. Use --build to specify one." 1>&2
+  finish 1
+fi
 
 if [ ! -d "lunchinator" ]
 then
@@ -41,7 +79,12 @@ export LUNCHINATOR_GIT="$(pwd)/lunchinator"
 export LUNCHINATOR_DEV="$DIR"
 export PYTHONPATH=$LUNCHINATOR_GIT:$PYTHONPATH
 
-branches=(master nightly)
+if $NIGHTLIES
+then
+  branches=(master nightly)
+else
+  branches=(master)
+fi
 
 for branch in "${branches[@]}"
 do
@@ -65,14 +108,19 @@ do
     export LAST_HASH
 
     #echo $VERSION
-    eval "./$1 --publish" 2>&1 | tee -a buildserver.log
+    if $PUBLISH
+    then
+      eval "./$BUILD_SCRIPT --publish" 2>&1 | tee -a buildserver.log
+    else
+      eval "./$BUILD_SCRIPT" 2>&1 | tee -a buildserver.log
+    fi
     if [ ${PIPESTATUS[0]} -eq 0 ]
     then
       log "Successfully built version $VERSION"
       echo $THIS_HASH > last_hash_${branch}
     fi
     log "Cleaning up"
-    eval "./$1 --clean" 2>&1 | tee -a buildserver.log
+    eval "./$BUILD_SCRIPT --clean" 2>&1 | tee -a buildserver.log
 
   fi
 
