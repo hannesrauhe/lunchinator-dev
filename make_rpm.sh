@@ -24,7 +24,7 @@ eval set -- "$args"
 PUBLISH=false
 
 function clean() {
-  pushd osc/home:${OBSUSERNAME}/lunchinator &>/dev/null
+  pushd osc/home:${OBSUSERNAME}/${LBASENAME} &>/dev/null
   for f in $(osc st | grep '^?' | sed -e 's/^?\s*//')
   do
     echo "Deleting ${f}"
@@ -39,7 +39,7 @@ function clean() {
 }
 
 function update() {
-  pushd osc/home:${OBSUSERNAME}/lunchinator &>/dev/null
+  pushd osc/home:${OBSUSERNAME}/${LBASENAME} &>/dev/null
   osc up
   popd &>/dev/null
 }
@@ -60,7 +60,7 @@ while [ $# -ge 1 ]; do
         exit 0
         ;;
     -h)
-        echo "Use with -p|--publish to publish to Launchpad immediately."
+        echo "Use with -p|--publish to publish to OBS immediately."
         exit 0
         ;;
   esac
@@ -95,6 +95,20 @@ then
   popd
 fi
 
+pushd "$LUNCHINATOR_GIT" &>/dev/null 
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export __lunchinator_branch=$BRANCH
+
+if [ $BRANCH == "master" ]
+then
+  LBASENAME=lunchinator
+  SPECFILE=Lunchinator.spec
+else
+  LBASENAME=lunchinator-${BRANCH}
+  SPECFILE=Lunchinator-${BRANCH}.spec
+fi
+popd &>/dev/null
+
 # make sure there are no unversioned files that are unintentionally checked in
 clean
 update
@@ -107,16 +121,17 @@ echo "$VERSION" > version
 export dist=
 # if this is run on Ubuntu, have setup.py know this is not for Ubuntu.
 export __notubuntu=1
-python setup.py sdist --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
-python setup.py bdist_rpm --spec-only --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/lunchinator"
+
+python setup.py sdist --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/${LBASENAME}"
+python setup.py bdist_rpm --spec-only --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/${LBASENAME}"
 popd &>/dev/null
-sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
-#sed -i -e 's/\(python setup\.py install.*$\)/\1 --prefix=usr --exec-prefix=usr/' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
-#sed -i -e '/%files.*/r add_files' osc/home:${OBSUSERNAME}/lunchinator/Lunchinator.spec
+
+sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/${LBASENAME}/$SPECFILE
+
 if $PUBLISH
 then
-  pushd osc/home:${OBSUSERNAME}/lunchinator
-  osc add Lunchinator.spec
+  pushd osc/home:${OBSUSERNAME}/${LBASENAME}
+  osc add $SPECFILE
   for f in $(osc st | grep '^?' | sed -e 's/^?\s*//')
   do
     osc add "$f"
