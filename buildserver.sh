@@ -131,5 +131,5 @@ do
   sleep 2
 done
 
-popd
 finish
+popd
