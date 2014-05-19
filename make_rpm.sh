@@ -3,6 +3,7 @@
 if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
 then
   LUNCHINATOR_GIT="$(pwd)/lunchinator"
+  LUNCHINATOR_DEV=".."
 fi
 
 if [ "$OBSUSERNAME" == "" ]
@@ -121,8 +122,8 @@ export dist=
 # if this is run on Ubuntu, have setup.py know this is not for Ubuntu.
 export __notubuntu=1
 
-python setup.py sdist --dist-dir="../osc/home:${OBSUSERNAME}/${LBASENAME}"
-python setup.py bdist_rpm --spec-only --dist-dir="../osc/home:${OBSUSERNAME}/${LBASENAME}"
+python setup.py sdist --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/${LBASENAME}"
+python setup.py bdist_rpm --spec-only --dist-dir="${LUNCHINATOR_DEV}/osc/home:${OBSUSERNAME}/${LBASENAME}"
 popd &>/dev/null
 
 sed -i -e 's/\(^BuildArch.*$\)/#\1/' osc/home:${OBSUSERNAME}/${LBASENAME}/$SPECFILE

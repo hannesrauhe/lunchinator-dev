@@ -20,7 +20,7 @@ function finish() {
   exit $1
 }
 
-DIR="$(dirname "${BASH_SOURCE[0]}")"
+DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 pushd $DIR
 
 log "---------- Starting build at $(date) ----------"
