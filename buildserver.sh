@@ -20,8 +20,8 @@ function finish() {
   exit $1
 }
 
-DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-pushd $DIR
+pushd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null
+DIR="$(pwd)"
 
 log "---------- Starting build at $(date) ----------"
 
@@ -99,12 +99,12 @@ do
     LAST_HASH=$(cat last_hash_${BUILD_SCRIPT}_${branch})
   fi
   
-  pushd "$LUNCHINATOR_GIT"
+  pushd "$LUNCHINATOR_GIT" &>/dev/null
   git checkout $branch
   git pull
 
   THIS_HASH="$(git rev-parse HEAD)"
-  popd
+  popd &>/dev/null
 
   if [ $LAST_HASH == $THIS_HASH ]
   then
@@ -133,4 +133,4 @@ do
 done
 
 finish
-popd
+popd &>/dev/null
