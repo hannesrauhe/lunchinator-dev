@@ -89,6 +89,7 @@ fi
 
 for branch in "${branches[@]}"
 do
+  export LUNCHINATOR_BRANCH="$branch"
   pushd "$LUNCHINATOR_GIT" &>/dev/null
   LAST_HASH=$(git rev-parse $(git describe --tags)^1)
   popd &>/dev/null

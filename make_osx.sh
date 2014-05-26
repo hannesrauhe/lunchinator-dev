@@ -78,12 +78,23 @@ then
   exit 1
 fi
 
+if [ "$LUNCHINATOR_BRANCH" == "master" ]
+then
+  UPLOAD_TARGET="update.lunchinator.de"
+elif [ "$LUNCHINATOR_BRANCH" == "nightly" ]
+then
+  UPLOAD_TARGET="nightly.lunchinator.de"
+else
+  echo "Unknown branch, cannot publish."
+  exit 1
+fi
+
 if $PUBLISH
 then
-  USER=$(security find-internet-password -s update.lunchinator.de | grep "acct" | cut -d '"' -f 4)
-  PASSWD=$(security 2>&1 >/dev/null find-internet-password -gs update.lunchinator.de | cut -d '"' -f 2)
+  USER=$(security find-internet-password -s "$UPLOAD_TARGET" | grep "acct" | cut -d '"' -f 4)
+  PASSWD=$(security 2>&1 >/dev/null find-internet-password -gs "$UPLOAD_TARGET" | cut -d '"' -f 2)
   ncftp <<EOF
-open -u ${USER} -p ${PASSWD} ftp://update.lunchinator.de/mac/
+open -u ${USER} -p ${PASSWD} "ftp://${UPLOAD_TARGET}/mac/"
 mput -rf dist/${VERSION}/
 mput -f dist/latest_version.asc
 quit
