@@ -1,8 +1,8 @@
 import os
-anaFiles = ["../start_lunchinator.py"]
-anaFiles.extend(aFile for aFile in os.listdir("../plugins") if os.path.isfile(aFile) and aFile.endswith(".py"))
-for aFile in os.listdir("../plugins"):
-    aFile = os.path.join("../plugins", aFile)
+anaFiles = ["start_lunchinator.py"]
+anaFiles.extend(aFile for aFile in os.listdir("plugins") if os.path.isfile(aFile) and aFile.endswith(".py"))
+for aFile in os.listdir("plugins"):
+    aFile = os.path.join("plugins", aFile)
     if aFile.endswith(".py"):
         anaFiles.append(aFile)
     if os.path.isdir(aFile):
@@ -26,5 +26,5 @@ exe = EXE(pyz,
           strip=None,
           upx=False,
 		  console = False,
-		  icon='..\\images\\lunchinator.ico')
+		  icon='images\\lunchinator.ico')
 		  
