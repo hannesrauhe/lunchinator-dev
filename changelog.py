@@ -68,6 +68,8 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                 logging.warning("Improperly formatted commit message for commit # " + aHash)
                 # tread each line as single commit
                 for line in message:
+                    if not line:
+                        continue
                     if line[0] in bulletpoints:
                         result.append(line[1:].strip())
                     else:

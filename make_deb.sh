@@ -12,6 +12,7 @@ function generate_changelog() {
 	  echo "$CHANGELOG" |
 	  while read line 
 	  do
+      echo "$line"
 	    dch -a "$line"
 	  done
   fi
