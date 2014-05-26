@@ -102,10 +102,10 @@ export __lunchinator_branch=$BRANCH
 if [ $BRANCH == "master" ]
 then
   LBASENAME=lunchinator
-  SPECFILE=Lunchinator.spec
+  SPECFILE=lunchinator.spec
 else
   LBASENAME=lunchinator-${BRANCH}
-  SPECFILE=Lunchinator-${BRANCH}.spec
+  SPECFILE=lunchinator-${BRANCH}.spec
 fi
 popd &>/dev/null
 
