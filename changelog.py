@@ -31,11 +31,15 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                                       "--format=%h",
                                       "%s..HEAD" % lastHash], path=path)
         hashes = hashes.split('\n')
+        if len(hashes) > 50:
+            hashes = hashes[:50]
         for aHash in reversed(hashes):
             message = getGitCommandOutput(["log",
                                            "--format=%B",
                                            "%(hash)s~1..%(hash)s" % {"hash":aHash}], path)
-            message = [line.strip() for line in message.strip().split('\n')]
+            # TODO there was a bug preventing the usage of colons in the change log
+            # remove at some point?
+            message = [line.strip().replace(':', ' -') for line in message.strip().split('\n')]
             if len(message) == 1:
                 # single line commit message
                 if not message[0]:
