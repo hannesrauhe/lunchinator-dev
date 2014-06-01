@@ -5,3 +5,7 @@ last_hash*
 buildserver.log
 .project
 .pydevproject
+nightly.ftp
+master.ftp
+commands.ftp
+win

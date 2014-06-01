@@ -54,6 +54,9 @@ versionInfo = ["Version String: " + versionString,
 
 if changeLog:
     versionInfo.append("Change Log: " + changeLog)
+    
+if os.getenv("LUNCHINATOR_BRANCH"):
+    versionInfo.append("Branch: " + os.getenv("LUNCHINATOR_BRANCH"))
 
 stringToSign = "\n".join(versionInfo)
 
@@ -64,19 +67,39 @@ if not gpg or not keyid:
 signedString = gpg.sign(stringToSign, keyid=keyid)
 print stringToSign
     
-version_file = open(os.path.join(os.path.dirname(sys.argv[1]), "latest_version.asc"), "w")
+working_dir = os.path.dirname(sys.argv[1])
+version_file = open(os.path.join(working_dir, "latest_version.asc"), "w")
 version_file.write(str(signedString))
 version_file.close()
 
-version_file = open(os.path.join(os.path.dirname(sys.argv[1]), "index.html"), "w")
+version_file = open(os.path.join(working_dir, "index.html"), "w")
 version_file.write('Download lunchinator: <a href="%s/%s">Version %s</a>' % (versionString, os.path.basename(fileToSign.name), versionString))
 version_file.close()
 
 # moving files around
 
-installer_dir = os.path.join(os.path.dirname(sys.argv[1]), versionString)
+installer_dir = os.path.join(working_dir, versionString)
 if not os.path.isdir(installer_dir):
     os.mkdir(installer_dir)
 
-shutil.copyfile(os.path.join(os.path.dirname(sys.argv[1]), "latest_version.asc"), os.path.join(os.path.dirname(sys.argv[1]), versionString, "version.asc"))
-shutil.copyfile(sys.argv[1], os.path.join(os.path.dirname(sys.argv[1]), versionString, os.path.basename(sys.argv[1])))
+shutil.copyfile(os.path.join(working_dir, "latest_version.asc"), os.path.join(working_dir, versionString, "version.asc"))
+shutil.copyfile(sys.argv[1], os.path.join(working_dir, versionString, os.path.basename(sys.argv[1])))
+
+if os.getenv("LUNCHINATOR_UPLOAD_FTP"):
+    ftp_up, _ , ftp_server = os.getenv("LUNCHINATOR_UPLOAD_FTP").partition("@")
+    ftp_user, _ , ftp_pass = ftp_up.partition(":")
+    ftp_file = open("commands.ftp", "w")
+    ftp_file.write("OPEN %s\n"%ftp_server)
+    ftp_file.write("%s\n" % ftp_user)
+    ftp_file.write("%s\n" % ftp_pass)
+    ftp_file.write("CD %s\n" % working_dir)
+    ftp_file.write("PROMPT\n")
+    ftp_file.write("PUT \"%s/latest_version.asc\"\n" % working_dir)
+    ftp_file.write("PUT \"%s/index.html\"\n" % working_dir)
+    ftp_file.write("mkdir \"%s\"\n" % versionString)
+    ftp_file.write("CD \"%s\"\n" % versionString)
+    ftp_file.write("PUT \"%s/%s/%s\"\n" % (working_dir, versionString, os.path.basename(sys.argv[1])))
+    ftp_file.write("PUT \"%s/%s/version.asc\"\n" % (working_dir, versionString))
+    ftp_file.write("QUIT\n")
+    ftp_file.close()
+    
