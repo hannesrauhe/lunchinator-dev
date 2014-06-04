@@ -25,7 +25,7 @@ DIR="$(pwd)"
 
 log "---------- Starting build at $(date) ----------"
 
-args=$(getopt -l "no-publish,no-nightlies,build:" -o "b:" -- "$@")
+args=$(getopt -l "no-publish,no-nightlies,build:,no-cleanup" -o "b:" -- "$@")
 
 if [ ! $? == 0 ]
 then
@@ -36,6 +36,7 @@ eval set -- "$args"
 
 NIGHTLIES=true
 PUBLISH=true
+CLEANUP=true
 
 while [ $# -ge 1 ]; do
   case "$1" in
@@ -53,6 +54,9 @@ while [ $# -ge 1 ]; do
         ;;
     --no-nightlies)
         NIGHTLIES=false
+        ;;
+    --no-cleanup)
+        CLEANUP=false
         ;;
     -h)
         echo "--no-publish to disable publishing, --no-nightlies to disable nightly builds."
@@ -124,8 +128,11 @@ do
       log "Successfully built version $VERSION"
       echo $THIS_HASH > last_hash_${BUILD_SCRIPT}_${branch}
     fi
-    log "Cleaning up"
-    eval "./$BUILD_SCRIPT --clean" 2>&1 | tee -a buildserver.log
+    if $CLEANUP
+    then
+      log "Cleaning up"
+      eval "./$BUILD_SCRIPT --clean" 2>&1 | tee -a buildserver.log
+    fi
 
   fi
 
