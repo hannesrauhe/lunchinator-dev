@@ -15,6 +15,7 @@ FOR %%B IN (master nightly) DO (
     
     cd lunchinator
     git checkout %%B
+	git pull
     git rev-parse HEAD>this_hash_makewin_%%B
     set /p THIS_HASH=<this_hash_makewin_%%B
     del this_hash_makewin_%%B
