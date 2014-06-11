@@ -98,8 +98,9 @@ if os.getenv("LUNCHINATOR_UPLOAD_FTP"):
     ftp_file.write("PUT \"%s/index.html\"\n" % working_dir)
     ftp_file.write("mkdir \"%s\"\n" % versionString)
     ftp_file.write("CD \"%s\"\n" % versionString)
-    ftp_file.write("PUT \"%s/%s/%s\"\n" % (working_dir, versionString, os.path.basename(sys.argv[1])))
     ftp_file.write("PUT \"%s/%s/version.asc\"\n" % (working_dir, versionString))
+    ftp_file.write("BINARY\n")
+    ftp_file.write("PUT \"%s/%s/%s\"\n" % (working_dir, versionString, os.path.basename(sys.argv[1])))
     ftp_file.write("QUIT\n")
     ftp_file.close()
     
