@@ -29,8 +29,8 @@ https://pypi.python.org/pypi/psutil#downloads
 install gpg: (vanilla)
 http://www.gpg4win.org/
 
-install gnupg via pip
-c:\Python2.7\python.exe -m pip install gnupg
+install python-gnupg, uuid via pip
+c:\Python2.7\python.exe -m pip install gnupg uuid
 
 install innosetup
 
