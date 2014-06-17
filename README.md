@@ -34,6 +34,10 @@ c:\Python2.7\python.exe -m pip install gnupg uuid
 
 install innosetup
 
+install lunchinator requirements for pyinstaller packages:
+*pyqt4 
+c:\Python2.7\python.exe -m pip install yapsy
+
 automatic Upload to ftp (currently win only, active ftp connection necessary - firewall): 
 hashnsigh.py generates commands.ftp if os.getenv("LUNCHINATOR_UPLOAD_FTP") returns the name of a file with the FTP details
 (make win sets LUNCHINATOR_UPLOAD_FTP to <branch>.ftp)

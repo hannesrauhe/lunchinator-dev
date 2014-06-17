@@ -21,6 +21,7 @@ Type: filesandordirs; Name: "{app}\lunchinator"
 
 [Files]
 Source: "lunchinator\dist\lunchinator.exe"; DestDir: "{app}"
+Source: "bin\*"; DestDir: "{app}\bin"
 Source: "lunchinator\*"; DestDir: "{app}\"; Flags: recursesubdirs; Excludes: "*.pyc,dist"
 
 [Icons]
