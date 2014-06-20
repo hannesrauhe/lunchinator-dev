@@ -28,6 +28,7 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
     try:
         result = []
         hashes = getGitCommandOutput(["log",
+                                      "--first-parent",
                                       "--format=%h",
                                       "%s..HEAD" % lastHash], path=path)
         hashes = hashes.split('\n')
