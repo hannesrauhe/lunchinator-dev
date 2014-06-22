@@ -24,10 +24,14 @@ Source: "lunchinator\dist\lunchinator.exe"; DestDir: "{app}"
 Source: "bin\*"; DestDir: "{app}\bin"
 Source: "lunchinator\*"; DestDir: "{app}\"; Flags: recursesubdirs; Excludes: "*.pyc,dist"
 
+[Tasks]
+Name: startup; Description: "Automatically start on login"; GroupDescription: "{cm:AdditionalIcons}"
+
 [Icons]
 Name: "{group}\Lunchinator"; Filename: "{app}\lunchinator.exe"; Parameters: "--show-window"; WorkingDir: "{app}"
 Name: "{group}\Lunchinator (Start Hidden)"; Filename: "{app}\lunchinator.exe"; WorkingDir: "{app}"
 Name: "{group}\Uninstall Lunchinator"; Filename: "{uninstallexe}"
+Name: "{userstartup}\Lunchinator"; Filename: "{app}\lunchinator.exe"; WorkingDir: "{app}" Tasks: startup
 
 [Dirs]
 Name: "{app}\plugins"
