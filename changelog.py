@@ -36,6 +36,7 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
             hashes = hashes[:50]
         for aHash in reversed(hashes):
             message = getGitCommandOutput(["log",
+                                           "--first-parent",
                                            "--format=%B",
                                            "%(hash)s~1..%(hash)s" % {"hash":aHash}], path)
             # TODO there was a bug preventing the usage of colons in the change log
