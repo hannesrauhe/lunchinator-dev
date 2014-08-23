@@ -14,11 +14,13 @@ except:
             sys.path.insert(0, path)
             break
         path = os.path.dirname(path)
-    
+
+from lunchinator.log import getCoreLogger, initializeLogger, setGlobalLoggingLevel
 from lunchinator.lunch_settings import lunch_settings
 from lunchinator.utilities import getGPGandKey
 from changelog import getLatestChangeLog
 
+initializeLogger("./hashnsign.log")
 logging.root.setLevel(logging.INFO)
 
 if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]):
