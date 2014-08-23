@@ -16,7 +16,8 @@ except:
         path = os.path.dirname(path)
     
 from lunchinator.lunch_settings import lunch_settings
-from lunchinator.utilities import getGPG
+from lunchinator.utilities import getGPGandKey
+from changelog import getLatestChangeLog
 
 logging.root.setLevel(logging.INFO)
 
@@ -60,7 +61,7 @@ if os.getenv("LUNCHINATOR_BRANCH"):
 
 stringToSign = "\n".join(versionInfo)
 
-gpg, keyid = getGPG(secret=True)
+gpg, keyid = getGPGandKey(secret=True)
 if not gpg or not keyid:
     sys.exit(-1)
 
