@@ -97,6 +97,7 @@ then
 open -u ${USER} -p ${PASSWD} "ftp://${UPLOAD_TARGET}/mac/"
 mput -rf dist/${VERSION}/
 mput -f dist/latest_version.asc
+mput -f dist/index.html 
 quit
 EOF
   if [ $? != 0 ]
