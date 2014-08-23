@@ -25,6 +25,6 @@ exe = EXE(pyz,
           debug=False,
           strip=None,
           upx=False,
-		  console = True,
+		  #console = True,
 		  icon='images\\lunchinator.ico')
 		  
