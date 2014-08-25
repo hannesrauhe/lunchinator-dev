@@ -41,8 +41,12 @@ FOR %%B IN (master nightly) DO (
         
         set /p LUNCHINATOR_UPLOAD_FTP=<%%B.ftp
         "C:\\Python27\\python.exe" hashNsign.py win/setup_lunchinator.exe
-        ftp -s:commands.ftp
-        echo !THIS_HASH!>last_hash_makewin_%%B
+        if errorlevel 1 (
+	   		echo hashnsighn failed: %errorlevel%
+		) else (
+        	ftp -s:commands.ftp
+        	echo !THIS_HASH!>last_hash_makewin_%%B
+        )
     )
     set LAST_HASH=
     set THIS_HASH=
