@@ -15,7 +15,7 @@ except:
             break
         path = os.path.dirname(path)
 
-from lunchinator.log import getCoreLogger, initializeLogger, setGlobalLoggingLevel
+from lunchinator.log import getCoreLogger, initializeLogger
 from lunchinator.lunch_settings import lunch_settings
 from lunchinator.utilities import getGPGandKey
 from changelog import getLatestChangeLog
