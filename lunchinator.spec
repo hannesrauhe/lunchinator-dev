@@ -15,6 +15,14 @@ a = Analysis(anaFiles,
              hiddenimports=['netrc'],
              hookspath=None,
              runtime_hooks=None)
+
+#workaround for http://www.pyinstaller.org/ticket/783#comment:5
+for d in a.datas:
+    if 'pyconfig' in d[0]: 
+        a.datas.remove(d)
+        break
+#workaround not necessary with Pyinstaller > 2.2
+
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
