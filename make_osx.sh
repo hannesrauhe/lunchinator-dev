@@ -5,7 +5,7 @@ then
   export LUNCHINATOR_GIT="$(pwd)/lunchinator"
 fi
 
-args=$(getopt -l "publish,clean" -o "pc" -- "$@")
+args=$(getopt -l "publish,clean,no-tarball" -o "pcn" -- "$@")
 
 if [ ! $? == 0 ]
 then
@@ -14,6 +14,7 @@ fi
 
 eval set -- "$args"
 
+TARBALL=true
 PUBLISH=false
 
 while [ $# -ge 1 ]; do
@@ -30,6 +31,9 @@ while [ $# -ge 1 ]; do
     -c|--clean)
         rm -rf build dist
         exit 0
+        ;;
+    -n|--no-tarball)
+        TARBALL=false
         ;;
     -h)
         echo "Use with -p|--publish to publish to Launchpad immediately."
@@ -63,6 +67,11 @@ EOF
 echo "*** copying python code into bundle ***"
 cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py dist/Lunchinator.app/Contents
 cp $(which terminal-notifier) dist/Lunchinator.app/Contents/bin
+
+if ! $TARBALL
+then
+  exit 0
+fi
 
 echo "*** Creating tarball ***"
 cd dist
