@@ -9,3 +9,5 @@ nightly.ftp
 master.ftp
 commands.ftp
 win
+*.pyc
+*.log
