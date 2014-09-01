@@ -30,6 +30,7 @@ Name: startup; Description: "Automatically start on login"; GroupDescription: "{
 [Icons]
 Name: "{group}\Lunchinator"; Filename: "{app}\lunchinator.exe"; Parameters: "--show-window"; WorkingDir: "{app}"
 Name: "{group}\Lunchinator (Start Hidden)"; Filename: "{app}\lunchinator.exe"; WorkingDir: "{app}"
+Name: "{group}\Lunchinator (Native Python)"; Filename: "python"; Parameters: "{app}\start_lunchinator.py"; WorkingDir: "{app}"
 Name: "{group}\Uninstall Lunchinator"; Filename: "{uninstallexe}"
 Name: "{userstartup}\Lunchinator"; Filename: "{app}\lunchinator.exe"; WorkingDir: "{app}"; Tasks: startup
 
