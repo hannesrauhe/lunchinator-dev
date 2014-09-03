@@ -18,13 +18,11 @@ for aFile in os.listdir("%s/plugins" % gitDir):
         anaFiles.append(aFile)
     if os.path.isdir(aFile):
         if os.path.exists(os.path.join(aFile, "__init__.py")):
-            for aFile2 in os.listdir(aFile):
-                if aFile2.endswith(".py"):
-                    anaFiles.append(os.path.join(aFile, aFile2))
-
+            anaFiles.append(os.path.join(aFile, "__init__.py"))
+        
 a = Analysis(anaFiles,
              pathex=['..'],
-             hiddenimports=[],
+             #hiddenimports=['cgi', 'netrc'],
              hookspath=None,
              runtime_hooks=None)
 pyz = PYZ(a.pure)
