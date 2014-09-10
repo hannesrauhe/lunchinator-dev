@@ -12,7 +12,7 @@ for aFile in os.listdir("plugins"):
 # -*- mode: python -*-
 a = Analysis(anaFiles,
              pathex=['.'],
-             hiddenimports=['netrc'],
+             hiddenimports=['netrc','markdown.extensions.extra'],
              hookspath=None,
              runtime_hooks=None)
 
