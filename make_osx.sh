@@ -65,7 +65,7 @@ Plugins=MacOS/qt4_plugins
 EOF
 
 echo "*** copying python code into bundle ***"
-cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py dist/Lunchinator.app/Contents
+cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py ${LUNCHINATOR_GIT}/lunchinator_pub_0x17F57DC2.asc dist/Lunchinator.app/Contents
 cp $(which terminal-notifier) dist/Lunchinator.app/Contents/bin
 
 if ! $TARBALL
