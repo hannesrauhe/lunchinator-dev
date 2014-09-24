@@ -10,6 +10,53 @@ def getGitCommandOutput(args, path):
     pOut, _pErr = p.communicate()
     return pOut
     
+def _extractChangelog(message, result, onlyFirstLine, aHash):
+    bulletpoints = set(('*', '-'))
+    message = [line.strip().replace(':', ' -') for line in message.strip().split('\n')]
+    if len(message) == 1:
+        # single line commit message
+        if not message[0]:
+            return
+        if message[0][0] in bulletpoints:
+            result.append(message[0][1:].strip())
+        else:
+            result.append(message[0])
+    elif len(message) > 2 and len(message[1]) == 0:
+        # properly formatted multi line commit
+        if message[0].lower().startswith("version "):
+            # Don't include version information
+            message = message[2:]
+            
+        skipSection = False
+        for line in message:
+            if len(line) == 0:
+                skipSection = False
+                continue
+            if skipSection:
+                continue
+            if line.lower().startswith("merge branch"):
+                continue
+            if line.lower().startswith("conflicts:"):
+                skipSection = True
+                continue
+            
+            if line[0] in bulletpoints:
+                if not onlyFirstLine:
+                    result.append("*" + line[1:].strip())
+            else:
+                result.append(line)
+    else:
+        logging.warning("Improperly formatted commit message for commit # " + aHash)
+        # tread each line as single commit
+        for line in message:
+            if not line:
+                continue
+            if line[0] in bulletpoints:
+                result.append(line[1:].strip())
+            else:
+                result.append(line)
+    
+    
 def getLatestChangeLog(lastHash, onlyFirstLine, path):
     """Reads the commit messages since a given tag
     
@@ -22,9 +69,6 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
     lastHash -- latest hash to NOT include
     onlyFirstLine -- For multi line commit messages, only return the description line
     """
-    
-    bulletpoints = set(('*', '-'))
-    
     try:
         result = []
         hashes = getGitCommandOutput(["log",
@@ -41,45 +85,7 @@ def getLatestChangeLog(lastHash, onlyFirstLine, path):
                                            "%(hash)s~1..%(hash)s" % {"hash":aHash}], path)
             # TODO there was a bug preventing the usage of colons in the change log
             # remove at some point?
-            message = [line.strip().replace(':', ' -') for line in message.strip().split('\n')]
-            if len(message) == 1:
-                # single line commit message
-                if not message[0]:
-                    continue
-                if message[0][0] in bulletpoints:
-                    result.append(message[0][1:].strip())
-                else:
-                    result.append(message[0])
-            elif len(message) > 2 and len(message[1]) == 0:
-                # properly formatted multi line commit
-                skipSection = False
-                for line in message:
-                    if len(line) == 0:
-                        skipSection = False
-                        continue
-                    if skipSection:
-                        continue
-                    if line.lower().startswith("merge branch"):
-                        continue
-                    if line.lower().startswith("conflicts:"):
-                        skipSection = True
-                        continue
-                    
-                    if line[0] in bulletpoints:
-                        if not onlyFirstLine:
-                            result.append("*" + line[1:].strip())
-                    else:
-                        result.append(line)
-            else:
-                logging.warning("Improperly formatted commit message for commit # " + aHash)
-                # tread each line as single commit
-                for line in message:
-                    if not line:
-                        continue
-                    if line[0] in bulletpoints:
-                        result.append(line[1:].strip())
-                    else:
-                        result.append(line)
+            _extractChangelog(message, result, onlyFirstLine, aHash)
             
         return result
     except:
