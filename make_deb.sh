@@ -19,7 +19,7 @@ function generate_changelog() {
   sed -i -e '/automatically created by stdeb/d' debian/changelog
 }
 
-dists=(lucid precise trusty)
+dists=(lucid precise trusty utopic)
 
 args=$(getopt -l "publish,clean" -o "pc" -- "$@")
 
