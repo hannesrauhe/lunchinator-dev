@@ -4,6 +4,8 @@ import json
 if os.getenv("LUNCHINATOR_GIT"):
     path = os.getenv("LUNCHINATOR_GIT")
     sys.path.insert(0, path)
+else:
+    sys.path.insert(0, "./lunchinator")
 
 try:
     import lunchinator
