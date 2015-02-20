@@ -71,7 +71,7 @@ if not gpg or not keyid:
     sys.exit(-1)
 
 signedString = gpg.sign(stringToSign, keyid=keyid)
-logging.info("I'll write this to the version file: \%s", signedString)
+logging.info("I'll write this to the version file: \n%s", signedString)
     
 working_dir = os.path.dirname(sys.argv[1])
 version_file = open(os.path.join(working_dir, "latest_version.asc"), "w")
