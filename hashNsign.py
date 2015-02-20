@@ -67,6 +67,7 @@ stringToSign = "\n".join(versionInfo)
 
 gpg, keyid = getGPGandKey(secret=True)
 if not gpg or not keyid:
+    logging.error("Cannot find GPG or key ID")
     sys.exit(-1)
 
 signedString = gpg.sign(stringToSign, keyid=keyid)
