@@ -1,6 +1,6 @@
 #!/bin/bash
 . /etc/profile
-export DEBFULLNAME="The Lunch Team"
+export DEBFULLNAME="Lunch Team"
 export DEBEMAIL=info@lunchinator.de
 export OBSUSERNAME=Cornelius_Ratsch
 
