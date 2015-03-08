@@ -65,8 +65,16 @@ Plugins=MacOS/qt4_plugins
 EOF
 
 echo "*** copying python code into bundle ***"
-cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py ${LUNCHINATOR_GIT}/lunchinator_pub_0x17F57DC2.asc dist/Lunchinator.app/Contents
+cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py ${LUNCHINATOR_GIT}/lunchinator_pub.asc dist/Lunchinator.app/Contents
 cp -r /usr/local/Cellar/terminal-notifier/1.6.2/terminal-notifier.app dist/Lunchinator.app/Contents/bin
+
+echo "*** Code-Signing Application ***"
+pushd dist &>/dev/null
+if ! codesign --deep -s "Code Signing" Lunchinator.app
+then
+  exit 1
+fi
+popd &>/dev/null
 
 if ! $TARBALL
 then
@@ -74,12 +82,12 @@ then
 fi
 
 echo "*** Creating tarball ***"
-cd dist
+pushd dist
 if ! tar cjf Lunchinator.app.tbz Lunchinator.app
 then
   exit 1
 fi
-cd ..
+popd &>/dev/null
 
 echo "*** Creating signature file ***"
 if ! PYTHONPATH=$LUNCHINATOR_GIT:$PYTHONPATH python hashNsign.py dist/Lunchinator.app.tbz
