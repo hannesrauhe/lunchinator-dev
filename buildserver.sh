@@ -126,7 +126,10 @@ do
     if [ ${PIPESTATUS[0]} -eq 0 ]
     then
       log "Successfully built version $VERSION"
-      echo $THIS_HASH > last_hash_${BUILD_SCRIPT}_${branch}
+      if $PUBLISH
+      then
+        echo $THIS_HASH > last_hash_${BUILD_SCRIPT}_${branch}
+      fi
     fi
     if $CLEANUP
     then
