@@ -21,7 +21,7 @@ for aFile in os.listdir("%s/plugins" % gitDir):
             anaFiles.append(os.path.join(aFile, "__init__.py"))
         
 a = Analysis(anaFiles,
-             pathex=['..'],
+             pathex=['lunchinator'],
              #hiddenimports=['cgi', 'netrc'],
              hookspath=None,
              runtime_hooks=None)

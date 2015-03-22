@@ -1,11 +1,24 @@
 #!/bin/bash
 
+# Prerequisites:
+# - Have the Lunchinator private key in your lunchinator gnupg keyring
+#   (~/.lunchinator/gnupg), import manually
+# - Have a code signing certificate named "Lunchinator" in your keychain
+# - Have a version of PyInstaller newer than 2.1 (currently, that is the
+#   "development" branch in the PyInstaller git)
+# - have ncftp installed (e.g., brew install ncftp)
+# - have the lunchinator FTP credentials in your keychain:
+#   - An internet password for update.lunchinator.de
+#   - An internet password for nightly.lunchinator.de
+# - have pyobjc installed (sudo pip install pyobjc)
+# - (probably also have pyobjc-core installed, sudo pip install pyobjc-core)
+
 if [ "$LUNCHINATOR_GIT" == "" ] && [ -d "lunchinator" ]
 then
   export LUNCHINATOR_GIT="$(pwd)/lunchinator"
 fi
 
-args=$(getopt -l "publish,clean,no-tarball" -o "pcn" -- "$@")
+args=$(getopt -l "publish,clean,no-tarball,no-codesign" -o "pcn" -- "$@")
 
 if [ ! $? == 0 ]
 then
@@ -16,6 +29,7 @@ eval set -- "$args"
 
 TARBALL=true
 PUBLISH=false
+CODESIGN=true
 
 while [ $# -ge 1 ]; do
   case "$1" in
@@ -34,6 +48,9 @@ while [ $# -ge 1 ]; do
         ;;
     -n|--no-tarball)
         TARBALL=false
+        ;;
+    --no-codesign)
+        CODESIGN=false
         ;;
     -h)
         echo "Use with -p|--publish to publish to Launchpad immediately."
@@ -68,13 +85,16 @@ echo "*** copying python code into bundle ***"
 cp -r ${LUNCHINATOR_GIT}/bin ${LUNCHINATOR_GIT}/images ${LUNCHINATOR_GIT}/lunchinator ${LUNCHINATOR_GIT}/plugins ${LUNCHINATOR_GIT}/sounds ${LUNCHINATOR_GIT}/start_lunchinator.py ${LUNCHINATOR_GIT}/lunchinator_pub.asc dist/Lunchinator.app/Contents
 cp -r /usr/local/Cellar/terminal-notifier/1.6.2/terminal-notifier.app dist/Lunchinator.app/Contents/bin
 
-echo "*** Code-Signing Application ***"
-pushd dist &>/dev/null
-if ! codesign --deep -s "Code Signing" Lunchinator.app
+if $CODESIGN
 then
-  exit 1
+  echo "*** Code-Signing Application ***"
+  pushd dist &>/dev/null
+  if ! codesign --deep -s "Lunchinator" Lunchinator.app
+  then
+    exit 1
+  fi
+  popd &>/dev/null
 fi
-popd &>/dev/null
 
 if ! $TARBALL
 then
@@ -82,7 +102,7 @@ then
 fi
 
 echo "*** Creating tarball ***"
-pushd dist
+pushd dist &>/dev/null
 if ! tar cjf Lunchinator.app.tbz Lunchinator.app
 then
   exit 1
