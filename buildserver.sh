@@ -1,15 +1,8 @@
 #!/bin/bash
-. /etc/profile
+
 export DEBFULLNAME="Lunch Team"
 export DEBEMAIL=info@lunchinator.de
 export OBSUSERNAME=Cornelius_Ratsch
-
-if [ $(uname) == "Darwin" ]
-then
-  # ensure environment is fine (MacPorts and stuff)
-  source ~/.profile
-  source ~/.bash_profile
-fi
 
 function log() {
   echo "$@" | tee -a buildserver.log
