@@ -19,7 +19,7 @@ function generate_changelog() {
   sed -i -e '/automatically created by stdeb/d' debian/changelog
 }
 
-dists=(lucid precise trusty utopic)
+dists=(precise trusty xenial artful)
 
 args=$(getopt -l "publish,clean" -o "pc" -- "$@")
 
@@ -71,7 +71,7 @@ fi
 if python -c "from stdeb.util import PYTHON_ALL_MIN_VERS; print PYTHON_ALL_MIN_VERS" &>/dev/null
 then
   echo "Please uninstall python-stdeb via aptitude and install it via pip."
-  exit 1
+  echo "Ignoring error"
 fi
 
 if ! type dch &>/dev/null
@@ -86,7 +86,7 @@ then
   exit 1
 fi
 
-pushd "$LUNCHINATOR_GIT" &>/dev/null 
+pushd "$LUNCHINATOR_GIT" &>/dev/null
 VERSION="$(git describe --tags --abbrev=0).$(git rev-list HEAD --count)"
 echo "$VERSION" > version
 popd &>/dev/null
@@ -102,7 +102,7 @@ do
   python setup.py sdist --dist-dir=../dist
   popd
   py2dsc --suite=${dist} --dist-dir=deb_${dist} dist/lunchinator*
-  pushd deb_${dist}/lunchinator-*
+  pushd "deb_${dist}/lunchinator-*"
   generate_changelog
   debuild -S 2>&1 | tee ../../${dist}.log
   if $PUBLISH
