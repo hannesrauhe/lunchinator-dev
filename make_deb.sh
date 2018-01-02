@@ -102,7 +102,7 @@ do
   python setup.py sdist --dist-dir=../dist
   popd
   py2dsc --suite=${dist} --dist-dir=deb_${dist} dist/lunchinator*
-  pushd "deb_${dist}/lunchinator-*"
+  pushd deb_${dist}/lunchinator-*.${dist}
   generate_changelog
   debuild -S 2>&1 | tee ../../${dist}.log
   if $PUBLISH
